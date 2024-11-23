@@ -1,4 +1,5 @@
 #include "control_mouse.hpp"
+#include "../utilities/config.hpp"
 #include <iostream>
 #include <cmath>
 #include <chrono>
@@ -20,11 +21,17 @@ control_mouse::control_mouse(const char* com_port, DWORD baud_rate) {
         m_connected = true;
         startPolling();
         std::cout << "[INFO] Serial port initialized successfully." << std::endl;
+
+        // Initialize Perlin noise settings
+        noise.SetNoiseType(FastNoiseLite::NoiseType_OpenSimplex2);
+        noise.SetFrequency(cfg::perlin_frequency);
     }
     else {
         std::cerr << "[ERROR] Failed to initialize serial port." << std::endl;
     }
 }
+
+
 
 // Destructor
 control_mouse::~control_mouse() {
@@ -148,26 +155,37 @@ void control_mouse::add_overflow(double& Input, double& Overflow) {
 void control_mouse::move(double x, double y, double smoothing) {
     double x_{ 0.0 }, y_{ 0.0 }, overflow_x{ 0.0 }, overflow_y{ 0.0 };
 
-    double u_x{ x / smoothing };
-    double u_y{ y / smoothing };
+    double u_x = x / smoothing;
+    double u_y = y / smoothing;
 
-    for (int i{ 1 }; i <= smoothing; ++i) {
-        double xI{ i * u_x };
-        double yI{ i * u_y };
+    for (int i = 1; i <= smoothing; ++i) {
+        double xI = i * u_x;
+        double yI = i * u_y;
+
+        // Apply Perlin noise if enabled
+        if (noise_enabled) {
+            float noise_x = noise.GetNoise(static_cast<float>(xI), 0.0f) * noise_amplitude;
+            float noise_y = noise.GetNoise(0.0f, static_cast<float>(yI)) * noise_amplitude;
+            xI += noise_x;
+            yI += noise_y;
+        }
 
         add_overflow(xI, overflow_x);
         add_overflow(yI, overflow_y);
 
-        int final_x{ static_cast<int>(xI - x_) };
-        int final_y{ static_cast<int>(yI - y_) };
+        int final_x = static_cast<int>(xI - x_);
+        int final_y = static_cast<int>(yI - y_);
 
         if (final_x != 0 || final_y != 0) {
             this->send_coordinates(final_x, final_y);
         }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        x_ = xI; y_ = yI;
+        x_ = xI;
+        y_ = yI;
     }
 }
+
 
 // Simulates a mouse click
 bool control_mouse::click() {
@@ -257,6 +275,16 @@ void control_mouse::processIncomingData(const std::string& data) {
         }
     }
 }
+
+
+
+void control_mouse::update_noise_settings() {
+    noise.SetFrequency(noise_frequency);
+    std::cout << "[INFO] Updated Perlin noise settings: Frequency = "
+        << noise_frequency << ", Amplitude = " << noise_amplitude << "\n";
+}
+
+
 
 // Check connection status
 bool control_mouse::is_connected() {

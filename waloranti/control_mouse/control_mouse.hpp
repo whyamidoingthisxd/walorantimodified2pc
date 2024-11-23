@@ -7,6 +7,7 @@
 #include <mutex>
 #include <string>
 #include <thread>
+#include "FastNoiseLite.h"
 
 // Button struct for button mappings
 struct Button {
@@ -28,6 +29,10 @@ private:
 
     int last_button_state{ 0 };                   // Tracks button state
     static const Button buttons[];               // Button mappings (defined in .cpp)
+    FastNoiseLite noise; // Perlin noise generator
+    bool noise_enabled{ false };  // Toggle for Perlin noise
+    float noise_frequency{ 0.1f }; // Frequency for Perlin noise
+    float noise_amplitude{ 5.0f }; // Amplitude for Perlin noise
 
     // Private methods
     bool initSerial(const char* com_port, DWORD baud_rate);
@@ -52,6 +57,8 @@ public:
     void registerButtonCallback(std::function<void(int)> callback);
     void startPolling();
     void stopPolling();
+    void update_noise_settings();
+
 };
 
 #endif // CONTROL_MOUSE_HPP

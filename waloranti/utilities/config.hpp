@@ -5,18 +5,21 @@
 
 namespace cfg
 {
-	constexpr int aimbot_key{ VK_LBUTTON };
-	constexpr int magnet_key{ VK_XBUTTON2 };
+	inline int aimbot_key = VK_XBUTTON2;  // Default value
+	constexpr int magnet_key{ VK_MBUTTON };
 	constexpr int flick_key{ VK_XBUTTON1 };
 	constexpr int head_offset_x{ 2 };
 	constexpr int head_offset_y{ 4 };
 	inline int magnet_fov{ 9 };
 	inline int magnet_smooth{ 8 };
 	inline int magnet_delay_between_shots{ 200 };
-	inline int aimbot_fov{ 9 };
-	inline int aimbot_smooth{ 14 };
-	inline int recoil_length{ 44 };
+	inline int aimbot_fov{ 40 };
+	inline int aimbot_smooth{ 13 };
+	inline int recoil_length{ 25 };
 	inline double recoil_offset{ 0 };
+	inline bool use_perlin_noise = false;  // Toggle for enabling/disabling Perlin noise
+	inline float perlin_frequency = 0.1f; // Frequency of Perlin noise
+	inline float perlin_amplitude = 5.0f;  // Amplitude of Perlin noise
 }
 
 inline int RED_RANGE[] = { 200, 255 };

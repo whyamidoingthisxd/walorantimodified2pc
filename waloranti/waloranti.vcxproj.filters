@@ -158,6 +158,9 @@
     <ClInclude Include="..\..\..\..\Desktop\Release\CH340TEST\CH340TEST\utils.hpp">
       <Filter>control_mouse</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\Desktop\Release\CH340TEST\CH340TEST\FastNoiseLite.h">
+      <Filter>control_mouse</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="waloranti.rc">

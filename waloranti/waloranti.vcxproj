@@ -192,6 +192,7 @@
     <ClCompile Include="utilities\utilities.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\Desktop\Release\CH340TEST\CH340TEST\FastNoiseLite.h" />
     <ClInclude Include="..\..\..\..\Desktop\Release\CH340TEST\CH340TEST\utils.hpp" />
     <ClInclude Include="capture_screen\capture_screen.hpp" />
     <ClInclude Include="capture_screen\dda_impl.hpp" />

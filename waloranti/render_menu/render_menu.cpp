@@ -4,6 +4,7 @@
 #include "../utilities/config.hpp"
 #include "../utilities/skcrypt.hpp"
 #include "../myfont.hpp"
+#include <string>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND window, UINT message, WPARAM wideParameter, LPARAM longParameter);
 
@@ -226,16 +227,71 @@ void render_menu::render()
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0.f, 2.f));
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.f, 6.f));
 	ImGui::PushItemWidth( ImGui::GetContentRegionAvail().x - 1 );
+
+	static bool is_rebinding = false; // Tracks if we are rebinding a key
+	static std::string key_display = "Press a key..."; // Text for key rebinding
+
 	switch ( current_tab )
 	{
-		case 0:
-			ImGui::Text(skcrypt("Field of View"));
-			ImGui::SliderInt(skcrypt("##aimbot_fov"), &cfg::aimbot_fov, 0, 40);
-			ImGui::Text(skcrypt("Smoothing"));
-			ImGui::SliderInt(skcrypt("##aimbot_smooth"), &cfg::aimbot_smooth, 1, 20);
-			ImGui::Text(skcrypt("Recoil length"));
-			ImGui::SliderInt(skcrypt("##recoil_length"), &cfg::recoil_length, 0, 50);
+	case 0:
+		ImGui::Text(skcrypt("Field of View"));
+		ImGui::SliderInt(skcrypt("##aimbot_fov"), &cfg::aimbot_fov, 0, 40);
+		ImGui::Text(skcrypt("Smoothing"));
+		ImGui::SliderInt(skcrypt("##aimbot_smooth"), &cfg::aimbot_smooth, 1, 20);
+		ImGui::Text(skcrypt("Recoil length"));
+		ImGui::SliderInt(skcrypt("##recoil_length"), &cfg::recoil_length, 0, 50);
+
+		ImGui::Text("Aimbot Keybind:");                // Label for the keybind section
+		if (is_rebinding) {
+			ImGui::Text(key_display.c_str());          // Display current rebinding status
+
+			// Check for key press
+			for (int key = 0; key < 256; ++key) {      // Loop through all virtual keys (0-255)
+				if (ImGui::IsKeyPressed(key)) {        // Detect a key press
+					cfg::aimbot_key = key;             // Update the configuration with the new key
+					key_display = "Bound to key: " + std::to_string(key); // Update feedback
+					is_rebinding = false;              // Exit rebinding mode
+					break;
+				}
+			}
+
+			// Handle mouse buttons explicitly
+			if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) { // Left mouse button
+				cfg::aimbot_key = VK_LBUTTON;
+				key_display = "Bound to: Left Mouse Button";
+				is_rebinding = false;
+			}
+			else if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) { // Right mouse button
+				cfg::aimbot_key = VK_RBUTTON;
+				key_display = "Bound to: Right Mouse Button";
+				is_rebinding = false;
+			}
+			else if (GetAsyncKeyState(VK_MBUTTON) & 0x8000) { // Middle mouse button
+				cfg::aimbot_key = VK_MBUTTON;
+				key_display = "Bound to: Middle Mouse Button";
+				is_rebinding = false;
+			}
+			else if (GetAsyncKeyState(VK_XBUTTON1) & 0x8000) { // Mouse XButton1
+				cfg::aimbot_key = VK_XBUTTON1;
+				key_display = "Bound to: Mouse Button 4";
+				is_rebinding = false;
+			}
+			else if (GetAsyncKeyState(VK_XBUTTON2) & 0x8000) { // Mouse XButton2
+				cfg::aimbot_key = VK_XBUTTON2;
+				key_display = "Bound to: Mouse Button 5";
+				is_rebinding = false;
+			}
+		}
+		else {
+			key_display = "Current key: " + std::to_string(cfg::aimbot_key); // Show currently bound key
+			ImGui::Text(key_display.c_str());         // Display the current binding
+			if (ImGui::Button("Rebind Key")) {        // Button to start rebinding
+				is_rebinding = true;                  // Enter rebinding mode
+				key_display = "Press a key...";       // Update feedback
+			}
+		}
 		break;
+
 		case 1:
 			ImGui::Text(skcrypt("Field of View"));
 			ImGui::SliderInt(skcrypt("##magnet_fov"), &cfg::magnet_fov, 0, 40);
@@ -244,9 +300,14 @@ void render_menu::render()
 			ImGui::Text(skcrypt("Delay between shots (ms)"));
 			ImGui::SliderInt(skcrypt("##recoil_length"), &cfg::magnet_delay_between_shots, 100, 300);
 		break;
+
 		case 2:
-			ImGui::Text(skcrypt("Coming soon"));
+			ImGui::Text("Perlin Noise Settings");
+			ImGui::Checkbox("Enable Perlin Noise", &cfg::use_perlin_noise);
+			ImGui::SliderFloat("Frequency", &cfg::perlin_frequency, 0.01f, 1.0f);
+			ImGui::SliderFloat("Amplitude", &cfg::perlin_amplitude, 0.0f, 10.0f);
 		break;
+
 		default:
 			ImGui::Text(skcrypt("How did you get here?"));
 		break;
