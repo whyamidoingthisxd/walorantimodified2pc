@@ -85,7 +85,7 @@ bool render_menu::create_device()
 	sd.BufferDesc.Width = 0;
 	sd.BufferDesc.Height = 0;
 	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.RefreshRate.Numerator = 60;
+	sd.BufferDesc.RefreshRate.Numerator = 240;
 	sd.BufferDesc.RefreshRate.Denominator = 1;
 	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -191,7 +191,7 @@ void render_menu::render()
 	ImGui::SetNextWindowSize( { width - 16, height - 39 } );
 
 	static int current_tab{ 0 };
-	const char* tabs[ ] = { "0", "1", "2" };
+	const char* tabs[] = { "0", "1", "2", "3" };
 
 	ImGui::Begin(
 		skcrypt( "##main_window" ),
@@ -228,18 +228,37 @@ void render_menu::render()
 	ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0.f, 6.f));
 	ImGui::PushItemWidth( ImGui::GetContentRegionAvail().x - 1 );
 
+	///////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////////////////////////
+
 	static bool is_rebinding = false; // Tracks if we are rebinding a key
 	static std::string key_display = "Press a key..."; // Text for key rebinding
+
+	static bool is_rebinding_flick_key = false; // Tracks if we are rebinding the Flickbot key
+	static std::string flick_key_display = "Press a key..."; // Text for Flickbot key rebinding
 
 	switch ( current_tab )
 	{
 	case 0:
 		ImGui::Text(skcrypt("Field of View"));
-		ImGui::SliderInt(skcrypt("##aimbot_fov"), &cfg::aimbot_fov, 0, 40);
+		ImGui::SliderInt(skcrypt("##aimbot_fov"), &cfg::aimbot_fov, 0, 100);
 		ImGui::Text(skcrypt("Smoothing"));
 		ImGui::SliderInt(skcrypt("##aimbot_smooth"), &cfg::aimbot_smooth, 1, 20);
 		ImGui::Text(skcrypt("Recoil length"));
 		ImGui::SliderInt(skcrypt("##recoil_length"), &cfg::recoil_length, 0, 50);
+		ImGui::Text("Head Offset X"); // Add a label
+		ImGui::SliderInt("##head_offset_x", &cfg::head_offset_x, -10, 10); // Slider for X offset
+		ImGui::Text("Head Offset Y"); // Add a label
+		ImGui::SliderInt("##head_offset_y", &cfg::head_offset_y, -10, 10); // Slider for Y offset
 
 		ImGui::Text("Aimbot Keybind:");                // Label for the keybind section
 		if (is_rebinding) {
@@ -307,6 +326,79 @@ void render_menu::render()
 			ImGui::SliderFloat("Frequency", &cfg::perlin_frequency, 0.01f, 1.0f);
 			ImGui::SliderFloat("Amplitude", &cfg::perlin_amplitude, 0.0f, 10.0f);
 		break;
+
+		case 3: // Flickbot Tab
+			ImGui::Text("Sensitivity:");
+			if (ImGui::SliderFloat("##sensitivity", &cfg::sens, 0.1f, 10.0f, "%.3f")) {
+				cfg::update_flick_distance(); // Recalculate the flick distance
+			}
+
+			ImGui::Text("Flick Distance:");
+			ImGui::Text("%.3f", cfg::flick_distance); // Display calculated flick distance
+
+			ImGui::Text("Horizontal FOV:");
+			ImGui::SliderInt("##flick_fov_x", &cfg::flick_fov_x, 50, 300);
+
+			ImGui::Text("Vertical FOV:");
+			ImGui::SliderInt("##flick_fov_y", &cfg::flick_fov_y, 25, 150);
+
+			ImGui::Text("Flick Smoothness:");
+			ImGui::SliderInt("##flick_smooth", &cfg::flick_smooth, 1, 20);
+
+			ImGui::Text("Flick Delay (ms):");
+			ImGui::SliderInt("##flick_delay", &cfg::flick_delay, 50, 500);
+
+			ImGui::Text("Flickbot Keybind:");
+			if (is_rebinding_flick_key) {
+				ImGui::Text(flick_key_display.c_str()); // Display current rebinding status
+
+				// Check for key press
+				for (int key = 0; key < 256; ++key) { // Loop through all virtual keys (0-255)
+					if (ImGui::IsKeyPressed(key)) { // Detect a key press
+						cfg::flick_key = key; // Update the configuration with the new key
+						flick_key_display = "Bound to key: " + std::to_string(key); // Update feedback
+						is_rebinding_flick_key = false; // Exit rebinding mode
+						break;
+					}
+				}
+
+				// Handle mouse buttons explicitly
+				if (GetAsyncKeyState(VK_LBUTTON) & 0x8000) { // Left mouse button
+					cfg::flick_key = VK_LBUTTON;
+					flick_key_display = "Bound to: Left Mouse Button";
+					is_rebinding_flick_key = false;
+				}
+				else if (GetAsyncKeyState(VK_RBUTTON) & 0x8000) { // Right mouse button
+					cfg::flick_key = VK_RBUTTON;
+					flick_key_display = "Bound to: Right Mouse Button";
+					is_rebinding_flick_key = false;
+				}
+				else if (GetAsyncKeyState(VK_MBUTTON) & 0x8000) { // Middle mouse button
+					cfg::flick_key = VK_MBUTTON;
+					flick_key_display = "Bound to: Middle Mouse Button";
+					is_rebinding_flick_key = false;
+				}
+				else if (GetAsyncKeyState(VK_XBUTTON1) & 0x8000) { // Mouse XButton1
+					cfg::flick_key = VK_XBUTTON1;
+					flick_key_display = "Bound to: Mouse Button 4";
+					is_rebinding_flick_key = false;
+				}
+				else if (GetAsyncKeyState(VK_XBUTTON2) & 0x8000) { // Mouse XButton2
+					cfg::flick_key = VK_XBUTTON2;
+					flick_key_display = "Bound to: Mouse Button 5";
+					is_rebinding_flick_key = false;
+				}
+			}
+			else {
+				flick_key_display = "Current key: " + std::to_string(cfg::flick_key); // Show currently bound key
+				ImGui::Text(flick_key_display.c_str()); // Display the current binding
+				if (ImGui::Button("Rebind Flickbot Key")) { // Button to start rebinding
+					is_rebinding_flick_key = true; // Enter rebinding mode
+					flick_key_display = "Press a key..."; // Update feedback
+				}
+			}
+
+			break;
 
 		default:
 			ImGui::Text(skcrypt("How did you get here?"));

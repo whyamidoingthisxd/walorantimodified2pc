@@ -36,7 +36,7 @@ private:
     };
 public:
     capture_screen() { initialize( ); }
-    void screenshot( int timeout = 500 );
+    void screenshot( int timeout = 25 );
     std::vector<int> get_rgb(int x, int y);
     int get_width( ) { return m_screen_width; }
     int get_height( ) { return m_screen_height; }

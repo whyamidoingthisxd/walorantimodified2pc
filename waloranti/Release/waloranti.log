@@ -1,4 +1,32 @@
-﻿  render_menu.cpp
+﻿  capture_screen.cpp
+  control_mouse.cpp
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(28,30): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'capture_screen/capture_screen.cpp')
+  
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(35,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'capture_screen/capture_screen.cpp')
+  
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(28,30): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'control_mouse/control_mouse.cpp')
+  
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(35,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'control_mouse/control_mouse.cpp')
+  
+  enemy_scanner.cpp
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(28,30): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'enemy_scanner/enemy_scanner.cpp')
+  
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(35,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'enemy_scanner/enemy_scanner.cpp')
+  
+  main.cpp
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(28,30): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'main.cpp')
+  
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(35,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'main.cpp')
+  
+  render_menu.cpp
 C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\dxgitype.h(12,1): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
   (compiling source file 'render_menu/render_menu.cpp')
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\winerror.h(58160,1):
@@ -139,9 +167,15 @@ C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include\d3d10.h(609,1):
   C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\winerror.h(58650,1):
   see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
   
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(28,30): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'render_menu/render_menu.cpp')
+  
+C:\Users\j\Downloads\waloranti-main\waloranti\waloranti\utilities\config.hpp(35,31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  (compiling source file 'render_menu/render_menu.cpp')
+  
   Generating code
-  53 of 1971 functions ( 2.7%) were compiled, the rest were copied from previous compilation.
-    33 functions were new in current compilation
-    52 functions had inline decision re-evaluated but remain unchanged
+  48 of 1979 functions ( 2.4%) were compiled, the rest were copied from previous compilation.
+    28 functions were new in current compilation
+    18 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   waloranti.vcxproj -> C:\Users\j\Downloads\waloranti-main\waloranti\Release\waloranti.exe

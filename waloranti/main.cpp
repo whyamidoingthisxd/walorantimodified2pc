@@ -38,6 +38,37 @@ void recoil_control() {
     }
 }
 
+// Flick logic function
+void handle_flickbot(control_mouse& mouse, enemy_scanner& enemy, stopwatch& timer) {
+    if (!utilities::is_pressed(cfg::flick_key)) return;
+
+    // Find the closest enemy within the flick FOV
+    std::vector<int> enemy_head = enemy.find_flick_target(cfg::flick_fov_x, cfg::flick_fov_y);
+
+    if (enemy_head[0] == 0 && enemy_head[1] == 0) return; // No enemy found
+
+    // Check if the delay between flicks has passed
+    if (timer.get_elapsed() < cfg::flick_delay) return;
+
+    // Calculate the vector for the flick
+    float move_x = enemy_head[0] * cfg::flick_distance;
+    float move_y = enemy_head[1] * cfg::flick_distance;
+
+    // Instantly flick to the target
+    mouse.move(move_x, move_y, 1); // Move instantly (smoothing = 1)
+
+    // Simulate a click
+    mouse.click();
+
+    // If silent aim is enabled, flick back to the original position
+    if (cfg::silent_aim) {
+        mouse.move(-move_x, -move_y, 1);
+    }
+
+    // Update the flick timer
+    timer.update();
+}
+
 // Render menu logic
 void menu_thread() {
     utilities::set_thread_priority(THREAD_PRIORITY_BELOW_NORMAL);
@@ -89,6 +120,25 @@ int main() {
             enemy.update();
         }
 
+        if (utilities::is_pressed(cfg::flick_key)) {
+            // Find flick target within specified FOV
+            std::vector<int> flick_target = enemy.find_flick_target(cfg::flick_fov_x, cfg::flick_fov_y);
+
+            // Ensure a valid target was found
+            if (flick_target[0] != 0 || flick_target[1] != 0) {
+                // Move mouse to target position, scaled by flick distance
+                mouse.move(flick_target[0] * cfg::flick_distance, flick_target[1] * cfg::flick_distance, cfg::flick_smooth);
+
+                // Perform a mouse click
+                mouse.click();
+
+                // Delay between flicks
+                std::this_thread::sleep_for(std::chrono::milliseconds(cfg::flick_delay));
+            }
+        }
+
+
+
         if (utilities::is_pressed(cfg::magnet_key)) {
             enemy_head = enemy.find_closest_enemy_head(cfg::magnet_fov);
 
@@ -108,8 +158,7 @@ int main() {
                 mouse.move(enemy_head[0], enemy_head[1], cfg::aimbot_smooth);
             }
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Avoid CPU overutilization
     }
 
     return EXIT_FAILURE;

@@ -21,7 +21,7 @@ public:
 		if ( !this->capture) { return; }
 		this->capture->screenshot( );
 	}
-
+	std::vector<int> find_flick_target(int fov_x, int fov_y) const;
 	bool is_enemy_outline( const std::vector<int>& pixel ) const;
 	bool is_enemy_outline_old( const std::vector< int >& pixel ) const;
 	bool is_enemy_in_crosshair( ) const;
