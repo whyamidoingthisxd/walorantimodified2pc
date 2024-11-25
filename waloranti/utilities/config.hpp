@@ -7,13 +7,17 @@
 namespace cfg
 {
 	inline int aimbot_key = VK_LBUTTON;  // Default value
-	constexpr int magnet_key{ VK_MBUTTON };
-	inline int flick_key{ VK_XBUTTON1 }; // Default to Mouse Button 4
+	inline int magnet_key{ VK_MBUTTON };
+	inline int flick_key{ VK_SPACE }; // Default to Mouse Button 4
+	inline int triggerbot_key = VK_XBUTTON1; // Default trigger key
 	inline int head_offset_x = 1;
+
 	inline int head_offset_y = -2;
-	inline int magnet_fov{ 9 };
-	inline int magnet_smooth{ 8 };
+
+	inline int magnet_fov{ 27 };
+	inline int magnet_smooth{ 3 };
 	inline int magnet_delay_between_shots{ 200 };
+
 	inline int aimbot_fov{ 27 };
 	inline int aimbot_smooth{ 3 };
 	inline int recoil_length{ 25 };
@@ -30,7 +34,6 @@ namespace cfg
 	inline int flick_fov_y = 50;      // Vertical FOV for flickbot
 	inline int flick_smooth = 5;      // Smoothing for flickbot movements
 	inline int flick_delay = 250;     // Delay in milliseconds between flicks
-
 	inline void update_flick_distance() {
 		flick_distance = 1.07437623 * pow(sens, -0.9936827126);
 	}
@@ -40,6 +43,15 @@ namespace cfg
 
 	inline int menorHSV[3] = { 260, 20, 40 };   // Min HSV for purple (Hue, Saturation, Value)
 	inline int maiorHSV[3] = { 300, 80, 100 };  // Max HSV for purple (Hue, Saturation, Value)
+
+	inline int triggerbot_tolerance = 70; // Tolerance for color change
+	inline int triggerbot_delay = 80; // Delay between triggers in ms
+
+	inline bool colorbot_enabled = true;
+	inline bool magnet_enabled = true;
+	inline bool flickbot_enabled = false;
+	inline bool triggerbot_enabled = false; // Enable or disable triggerbot
+
 
 }
 

@@ -8,6 +8,16 @@
 #include <thread>
 #include <chrono>
 
+void handle_triggerbot(control_mouse& mouse, enemy_scanner& enemy, stopwatch& timer) {
+    if (!cfg::triggerbot_enabled || !utilities::is_pressed(cfg::triggerbot_key)) return;
+
+    // Check if triggerbot detects a target and delay has passed
+    if (enemy.triggerbot_logic() && timer.get_elapsed() > cfg::triggerbot_delay) {
+        mouse.click(); // Send "km.click" command
+        timer.update(); // Reset the timer
+    }
+}
+
 // Recoil control logic
 void recoil_control() {
     utilities::set_thread_priority(THREAD_PRIORITY_TIME_CRITICAL);
@@ -40,7 +50,7 @@ void recoil_control() {
 
 // Flick logic function
 void handle_flickbot(control_mouse& mouse, enemy_scanner& enemy, stopwatch& timer) {
-    if (!utilities::is_pressed(cfg::flick_key)) return;
+    if (!cfg::flickbot_enabled || !utilities::is_pressed(cfg::flick_key)) return;
 
     // Find the closest enemy within the flick FOV
     std::vector<int> enemy_head = enemy.find_flick_target(cfg::flick_fov_x, cfg::flick_fov_y);
@@ -116,32 +126,31 @@ int main() {
 
     std::vector<int> enemy_head{};
     while (mouse.is_connected() && render_menu::is_running) {
-        if (utilities::is_pressed(cfg::aimbot_key) || utilities::is_pressed(cfg::magnet_key) || utilities::is_pressed(cfg::flick_key)) {
+
+        if (cfg::colorbot_enabled || cfg::magnet_enabled || cfg::flickbot_enabled || cfg::triggerbot_enabled) {
+            enemy.update(); // Update the screen capture only if any feature is enabled
+        }
+
+        if (utilities::is_pressed(cfg::aimbot_key) || utilities::is_pressed(cfg::magnet_key) || utilities::is_pressed(cfg::flick_key) || utilities::is_pressed(cfg::triggerbot_key)) {
             enemy.update();
         }
 
-        if (utilities::is_pressed(cfg::flick_key)) {
-            // Find flick target within specified FOV
+        if (cfg::flickbot_enabled && utilities::is_pressed(cfg::flick_key)) {
+            // Flickbot logic
             std::vector<int> flick_target = enemy.find_flick_target(cfg::flick_fov_x, cfg::flick_fov_y);
-
-            // Ensure a valid target was found
             if (flick_target[0] != 0 || flick_target[1] != 0) {
-                // Move mouse to target position, scaled by flick distance
                 mouse.move(flick_target[0] * cfg::flick_distance, flick_target[1] * cfg::flick_distance, cfg::flick_smooth);
-
-                // Perform a mouse click
                 mouse.click();
-
-                // Delay between flicks
                 std::this_thread::sleep_for(std::chrono::milliseconds(cfg::flick_delay));
             }
         }
 
+        if (cfg::triggerbot_enabled && utilities::is_pressed(cfg::triggerbot_key)) {
+            handle_triggerbot(mouse, enemy, timer);
+        }
 
-
-        if (utilities::is_pressed(cfg::magnet_key)) {
-            enemy_head = enemy.find_closest_enemy_head(cfg::magnet_fov);
-
+        if (cfg::magnet_enabled && utilities::is_pressed(cfg::magnet_key)) {
+            std::vector<int> enemy_head = enemy.find_closest_enemy_head(cfg::magnet_fov);
             if (enemy_head[0] != 0 || enemy_head[1] != 0) {
                 mouse.move(enemy_head[0], enemy_head[1], cfg::magnet_smooth);
             }
@@ -151,9 +160,9 @@ int main() {
                 timer.update();
             }
         }
-        else if (utilities::is_pressed(cfg::aimbot_key)) {
-            enemy_head = enemy.find_closest_enemy_head(cfg::aimbot_fov + static_cast<int>(cfg::recoil_offset));
 
+        else if (cfg::colorbot_enabled && utilities::is_pressed(cfg::aimbot_key)) {
+            std::vector<int> enemy_head = enemy.find_closest_enemy_head(cfg::aimbot_fov + static_cast<int>(cfg::recoil_offset));
             if (enemy_head[0] != 0 || enemy_head[1] != 0) {
                 mouse.move(enemy_head[0], enemy_head[1], cfg::aimbot_smooth);
             }

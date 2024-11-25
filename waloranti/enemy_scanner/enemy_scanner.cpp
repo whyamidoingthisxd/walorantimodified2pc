@@ -2,6 +2,7 @@
 
 #include "enemy_scanner.hpp"
 #include "../utilities/config.hpp"
+#include <iostream>
 #include <initializer_list>
 #include <algorithm> // For std::max and std::min
 #include <cmath>     // For abs() and other math functions
@@ -72,7 +73,7 @@ bool enemy_scanner::is_enemy_outline(const std::vector<int>& pixel) const {
 
 
 
-bool enemy_scanner::is_enemy_outline_old( const std::vector< int >& pixel ) const
+bool enemy_scanner::is_enemy_outline_old(const std::vector< int >& pixel) const
 {
     if (pixel[1] >= 170) {
         return false;
@@ -185,6 +186,23 @@ std::vector<int> enemy_scanner::find_closest_enemy_head(int fov_type) const {
     // Return target relative to the screen center
     return { target_x - center_x, target_y - center_y };
 }
+
+
+bool enemy_scanner::triggerbot_logic() const {
+    // Get the center of the screen
+    const int center_x = this->capture->get_width() / 2;
+    const int center_y = this->capture->get_height() / 2;
+
+    // Get the pixel color at the crosshair
+    const std::vector<int> pixel = this->capture->get_rgb(center_x, center_y);
+
+    // Reuse the is_enemy_outline() function for consistent detection logic
+    return this->is_enemy_outline(pixel);
+
+    std::cout << "[DEBUG] Triggerbot detected enemy in crosshair." << std::endl;
+}
+
+
 
 
 

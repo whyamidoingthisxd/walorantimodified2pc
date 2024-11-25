@@ -192,8 +192,13 @@ bool control_mouse::click() {
     if (!m_connected)
         return false;
 
-    return this->send_coordinates(0, 0);
+    // Format the command for clicking
+    std::string command = "km.click()\r\n";
+
+    // Send the command to the connected device
+    return write_port(command.c_str());
 }
+
 
 // Processes button states
 void control_mouse::processButtonState(int state) {
